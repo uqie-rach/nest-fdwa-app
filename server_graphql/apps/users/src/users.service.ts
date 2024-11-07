@@ -173,6 +173,8 @@ export class UsersService {
     const user = req.headers['user'];
     const refreshToken = req.headers['refreshtoken'];
     const accessToken = req.headers['accesstoken'];
+
+    console.log(user)
     
     return { user, refreshToken, accessToken };
   }
@@ -186,6 +188,8 @@ export class UsersService {
     req.headers['user'] = null;
     req.headers['accesstoken'] = null;
     req.headers['refreshtoken'] = null;
+
+    console.log(req)
     
     return { message: 'Logged out successfully!' };
   }

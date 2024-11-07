@@ -13,7 +13,7 @@ export class TokenHelper {
       { id: user.id },
       {
         secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
-        expiresIn: '5m',
+        expiresIn: '15m',
       },
     );
 

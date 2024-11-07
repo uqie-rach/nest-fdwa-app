@@ -47,4 +47,10 @@ export class LoginResponse {
 export class LogoutResponse { 
   @Field()
   message: string;
+
+  @Field({ nullable: true })
+  accessToken: string;
+
+  @Field({ nullable: true })
+  refreshToken: string;
 }

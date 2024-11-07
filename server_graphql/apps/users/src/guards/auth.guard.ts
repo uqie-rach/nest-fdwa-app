@@ -23,15 +23,11 @@ export class AuthGuard implements CanActivate {
     const accessToken = req.headers['accesstoken'] as string;
     const refreshToken = req.headers['refreshtoken'] as string;
 
-    console.log(refreshToken, accessToken);
-
     if (!accessToken || !refreshToken) {
       throw new UnauthorizedException('Please login to continue');
     }
 
     if (accessToken) {
-      console.log("Access Token found!")
-      console.log('[AuthGuard] Checking accessToken... : ', accessToken);
       const decoded = await this.jwtService.verify(accessToken, {
         secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
       });
@@ -40,15 +36,15 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Invalid access token');
       }
 
-      await this.updateAccessToken(req);
+      await this.updateAccessToken(req, refreshToken);
     }
 
     return true;
   }
 
-  async updateAccessToken(req: any): Promise<void> {
+  async updateAccessToken(req: any, refreshToken: string): Promise<void> {
     try {
-      const refreshToken = req.headers.refreshToken as string;
+
 
       if (refreshToken) {
         const decoded = await this.jwtService.verify(refreshToken, {
@@ -59,11 +55,13 @@ export class AuthGuard implements CanActivate {
           throw new UnauthorizedException('Invalid refresh token');
         }
 
+        
         const user = await this.prisma.user.findUnique({
           where: {
             id: decoded.id,
           },
         });
+
 
         const { password, ...saveUserData } = user;
 
@@ -87,9 +85,9 @@ export class AuthGuard implements CanActivate {
           },
         );
 
-        req.refreshToken = newRefreshToken;
-        req.accessToken = newAccessToken;
-        req.user = saveUserData;
+        req.headers['refreshtoken'] = newRefreshToken;
+        req.headers['accesstoken'] = newAccessToken;
+        req.headers['user'] = saveUserData;
       }
     } catch (error) {
       throw new UnauthorizedException(error?.message);
